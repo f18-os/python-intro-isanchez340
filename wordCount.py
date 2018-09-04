@@ -23,6 +23,7 @@ if os.path.exists(outputFname):
 
 words = {}
 
+
 with open(inputFname, 'r') as inputFile:
     for line in inputFile:
         # get rid of newline characters
