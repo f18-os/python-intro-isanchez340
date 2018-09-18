@@ -8,8 +8,8 @@ if rc < 0:
     sys.exit(1)
 
 elif rc == 0:
-    args = ["execute", "exec.py"]
-    os.execve(os.getcwd(), args, os.environ)
+    args = ["exec.py"]
+    os.execve("exec.py", args, os.environ)
 
 else:  # parent (forked ok)
     INP = input("$ ")
