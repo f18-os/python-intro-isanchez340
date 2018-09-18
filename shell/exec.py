@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os, sys, time, re, pickle
 
 with open ('outfile.txt', 'rb') as fp:
