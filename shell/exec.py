@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import os, sys, time, re, pickle
 
+n = 0
+
+
 with open ('outfile.txt', 'rb') as fp:
     list = pickle.load(fp)
 
