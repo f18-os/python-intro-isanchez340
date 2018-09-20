@@ -1,31 +1,54 @@
 #!/usr/bin/env python3
 import os, sys, time, re, pickle
-
-r, w = os.pipe()
-rc = os.fork()
 INP = ""
-if rc < 0:
-    os.write(2, ("fork failed, returning %d\n" % rc).encode())
-    sys.exit(1)
+while INP is not "exit":
+    INP = ""
+    r, w = os.pipe()
+    for f in (r, w):
+        os.set_inheritable(f, True)
 
-elif rc == 0:
-    os.close(r)
-    w = os.fdopen(w, 'w')
-    str = os.system(INP)
-    print(str)
-    w.close()
-    sys.exit(0)
+    rc = os.fork()
+    if rc < 0:
+        os.write(2, ("fork failed, returning %d\n" % rc).encode())
+        sys.exit(1)
 
-else:  # parent (forked ok)
-    INP = input('$ ')
-    INP = INP.strip()
-    os.set_inheritable(w, True)
-    os.set_inheritable(r, True)
-    childPidCode = os.wait()
-    os.close(w)
-    r = os.fdopen(r)
-    str = r.read()
-    print(os.system('ls'))
+    elif rc == 0:
+        INP = input('$ ')
+        if INP == "exit":
+            os.close(1)  # redirect child's stdout
+            os.dup(w)
+            for fd in (r, w):
+                os.close(fd)
+            print(1)
+            sys.exit(0)
+        try:
+            INP = os.system(INP)
+        except:
+            os.close(1)  # redirect child's stdout
+            os.dup(w)
+            for fd in (r, w):
+                os.close(fd)
+            print("command not found")
+            os.close(0)
+            sys.exit(0)
+
+        os.close(1)   # redirect child's stdout
+        os.dup(w)
+        for fd in (r, w):
+            os.close(fd)
+        print(INP)
+        os.close(0)
+        sys.exit(0)
+
+    else:  # parent (forked ok)
+        childPidCode = os.wait()
+        os.close(w)
+        r = os.fdopen(r)
+        str = r.read()
+        if str == 1:
+            sys.exit(0)
+
+        print(str)
 
 
 
